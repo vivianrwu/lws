@@ -71,7 +71,7 @@ var _ = ginkgo.Describe("leaderworkerset defaulting, creation and update", func(
 				return lwsWrapper
 			},
 			getExpectedLWS: func(lws *leaderworkerset.LeaderWorkerSet) *testutils.LeaderWorkerSetWrapper {
-				return testutils.BuildLeaderWorkerSet(ns.Name).Replica(1).RestartPolicy(leaderworkerset.DefaultRestartPolicy)
+				return testutils.BuildLeaderWorkerSet(ns.Name).Replica(1).RestartPolicy(leaderworkerset.RecreateGroupOnPodRestart)
 			},
 		}),
 		ginkgo.Entry("apply defaulting logic for size", &testDefaultingCase{
@@ -81,7 +81,7 @@ var _ = ginkgo.Describe("leaderworkerset defaulting, creation and update", func(
 				return lwsWrapper
 			},
 			getExpectedLWS: func(lws *leaderworkerset.LeaderWorkerSet) *testutils.LeaderWorkerSetWrapper {
-				return testutils.BuildLeaderWorkerSet(ns.Name).Size(1).RestartPolicy(leaderworkerset.DefaultRestartPolicy)
+				return testutils.BuildLeaderWorkerSet(ns.Name).Size(1).RestartPolicy(leaderworkerset.RecreateGroupOnPodRestart)
 			},
 		}),
 		ginkgo.Entry("defaulting logic won't apply when shouldn't", &testDefaultingCase{
@@ -89,7 +89,7 @@ var _ = ginkgo.Describe("leaderworkerset defaulting, creation and update", func(
 				return testutils.BuildLeaderWorkerSet(ns.Name).Replica(2).Size(2)
 			},
 			getExpectedLWS: func(lws *leaderworkerset.LeaderWorkerSet) *testutils.LeaderWorkerSetWrapper {
-				return testutils.BuildLeaderWorkerSet(ns.Name).Replica(2).Size(2).LeaderTemplateSpec(testutils.MakeLeaderPodSpec()).WorkerTemplateSpec(testutils.MakeWorkerPodSpec()).RestartPolicy(leaderworkerset.DefaultRestartPolicy)
+				return testutils.BuildLeaderWorkerSet(ns.Name).Replica(2).Size(2).LeaderTemplateSpec(testutils.MakeLeaderPodSpec()).WorkerTemplateSpec(testutils.MakeWorkerPodSpec()).RestartPolicy(leaderworkerset.RecreateGroupOnPodRestart)
 			},
 		}),
 		ginkgo.Entry("defaulting logic applies when leaderworkertemplate.restartpolicy is not set", &testDefaultingCase{
@@ -97,15 +97,15 @@ var _ = ginkgo.Describe("leaderworkerset defaulting, creation and update", func(
 				return testutils.BuildLeaderWorkerSet(ns.Name).Replica(2).Size(2).RestartPolicy("")
 			},
 			getExpectedLWS: func(lws *leaderworkerset.LeaderWorkerSet) *testutils.LeaderWorkerSetWrapper {
-				return testutils.BuildLeaderWorkerSet(ns.Name).Replica(2).Size(2).RestartPolicy(leaderworkerset.DefaultRestartPolicy)
+				return testutils.BuildLeaderWorkerSet(ns.Name).Replica(2).Size(2).RestartPolicy(leaderworkerset.RecreateGroupOnPodRestart)
 			},
 		}),
 		ginkgo.Entry("defaulting logic won't apply when leaderworkertemplate.restartpolicy is set", &testDefaultingCase{
 			makeLeaderWorkerSet: func(ns *corev1.Namespace) *testutils.LeaderWorkerSetWrapper {
-				return testutils.BuildLeaderWorkerSet(ns.Name).Replica(2).Size(2).RestartPolicy(leaderworkerset.RecreateGroupOnPodRestart)
+				return testutils.BuildLeaderWorkerSet(ns.Name).Replica(2).Size(2).RestartPolicy(leaderworkerset.DefaultRestartPolicy)
 			},
 			getExpectedLWS: func(lws *leaderworkerset.LeaderWorkerSet) *testutils.LeaderWorkerSetWrapper {
-				return testutils.BuildLeaderWorkerSet(ns.Name).Replica(2).Size(2).RestartPolicy(leaderworkerset.RecreateGroupOnPodRestart)
+				return testutils.BuildLeaderWorkerSet(ns.Name).Replica(2).Size(2).RestartPolicy(leaderworkerset.DefaultRestartPolicy)
 			},
 		}),
 		ginkgo.Entry("defaulting logic applies when spec.startpolicy is not set", &testDefaultingCase{
@@ -129,7 +129,7 @@ var _ = ginkgo.Describe("leaderworkerset defaulting, creation and update", func(
 				return testutils.BuildLeaderWorkerSet(ns.Name).RolloutStrategy(leaderworkerset.RolloutStrategy{}) // unset rollout strategy
 			},
 			getExpectedLWS: func(lws *leaderworkerset.LeaderWorkerSet) *testutils.LeaderWorkerSetWrapper {
-				return testutils.BuildLeaderWorkerSet(ns.Name).RestartPolicy(leaderworkerset.DefaultRestartPolicy).RolloutStrategy(leaderworkerset.RolloutStrategy{
+				return testutils.BuildLeaderWorkerSet(ns.Name).RestartPolicy(leaderworkerset.RecreateGroupOnPodRestart).RolloutStrategy(leaderworkerset.RolloutStrategy{
 					Type: leaderworkerset.RollingUpdateStrategyType,
 					RollingUpdateConfiguration: &leaderworkerset.RollingUpdateConfiguration{
 						MaxUnavailable: intstr.FromInt32(1),
@@ -149,7 +149,7 @@ var _ = ginkgo.Describe("leaderworkerset defaulting, creation and update", func(
 			},
 			getExpectedLWS: func(lws *leaderworkerset.LeaderWorkerSet) *testutils.LeaderWorkerSetWrapper {
 				return testutils.BuildLeaderWorkerSet(ns.Name).
-					RestartPolicy(leaderworkerset.DefaultRestartPolicy).
+					RestartPolicy(leaderworkerset.RecreateGroupOnPodRestart).
 					RolloutStrategy(leaderworkerset.RolloutStrategy{
 						Type: leaderworkerset.RollingUpdateStrategyType,
 						RollingUpdateConfiguration: &leaderworkerset.RollingUpdateConfiguration{
@@ -316,7 +316,7 @@ var _ = ginkgo.Describe("leaderworkerset defaulting, creation and update", func(
 		}),
 		ginkgo.Entry("set restart policy should succeed", &testValidationCase{
 			makeLeaderWorkerSet: func(ns *corev1.Namespace) *testutils.LeaderWorkerSetWrapper {
-				return testutils.BuildLeaderWorkerSet(ns.Name).RestartPolicy(leaderworkerset.RecreateGroupOnPodRestart)
+				return testutils.BuildLeaderWorkerSet(ns.Name).RestartPolicy(leaderworkerset.DefaultRestartPolicy)
 			},
 			lwsCreationShouldFail: false,
 		}),
